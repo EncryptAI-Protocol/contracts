@@ -7,9 +7,11 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract DataNFT is ERC721, AccessControl {
     bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
-    bytes32 public constant MODEL_DEVELOPER = keccak256("MODEL_DEVELOPER");
 
     string private ipfsURI;
+
+    uint256 public price;
+    uint256 public fee;
 
     event IPFSURISet(string indexed ipfsURI);
     event AccessGranted(address indexed user);
@@ -17,12 +19,16 @@ contract DataNFT is ERC721, AccessControl {
     event PredictionFeePaid(address indexed payer, uint256 amount);
     event Withdraw(address indexed recipient, uint256 amount);
 
-    constructor(address dataProvider,
-                address modelDeveloper, 
-                string memory name,
-                string memory symbol) ERC721(name, symbol) {
-        _grantRole(DATA_PROVIDER, dataProvider);
-        _grantRole(MODEL_DEVELOPER, modelDeveloper);
+    constructor(string memory name,
+                string memory symbol, 
+                string memory _ipfsURI, 
+                uint256 _price,
+                uint256 _fee) ERC721(name, symbol) {
+        _grantRole(DATA_PROVIDER, msg.sender);
+        ipfsURI = _ipfsURI;
+        price = _price;
+        fee = _fee;
+
     }
 
     function safeDataMint(address to, uint256 tokenId) public onlyRole(DATA_PROVIDER) {
@@ -51,18 +57,18 @@ contract DataNFT is ERC721, AccessControl {
     }
 
     function grantAccess(address user) external {
-        // Check if the user has a balance greater than zero or if they have paid the determined price
-        require(balanceOf(user) > 0, "User does not own any tokens");
+        // Check if the user has a balance greater than price or if they have paid the determined price
+        require(balanceOf(user) >= price, "User does not own any tokens");
         emit AccessGranted(user);
     }
     
     function payForDataUsage() external payable {
-        require(msg.value > 0, "Payment must be greater than zero");
+        require(msg.value >= price, "Payment must be greater than zero");
         emit DataUsagePaid(msg.sender, msg.value);
     }
     // Function to collect fees from users computing predictions
     function payPredictionFee() external payable {
-        require(msg.value > 0, "Payment must be greater than zero");
+        require(msg.value >= fee, "Payment must be greater than zero");
         emit PredictionFeePaid(msg.sender, msg.value);
     }
 

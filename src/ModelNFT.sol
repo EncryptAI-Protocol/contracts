@@ -16,20 +16,24 @@ contract ModelNFT is ERC721, AccessControl {
 
     string private ipfsURI;
     address public dataNFTAddress;
+    uint256 public price;
 
     event IPFSURISet(string indexed ipfsURI);
     event AccessGranted(address indexed user);
     event DataUsagePaid(address indexed payer, uint256 amount);
     event Withdraw(address indexed recipient, uint256 amount);
 
-    constructor(address modelDeveloper,
-                address consumer, 
+    constructor(address consumer, 
                 string memory name,
                 string memory symbol,
-                address _dataNFTAddress) ERC721(name, symbol) {
-        _grantRole(MODEL_DEVELOPER, modelDeveloper);
+                string memory _ipfsURI,
+                address _dataNFTAddress, 
+                uint256 _price) ERC721(name, symbol) {
+        _grantRole(MODEL_DEVELOPER, msg.sender);
         _grantRole(CONSUMER, consumer);
+        ipfsURI = _ipfsURI;
         dataNFTAddress = _dataNFTAddress;
+        price = _price;
     }
 
     function safeDataMint(address to, uint256 tokenId) public onlyRole(MODEL_DEVELOPER) {
@@ -59,12 +63,12 @@ contract ModelNFT is ERC721, AccessControl {
 
     function grantAccess(address user) external {
         // Check if the user has a balance greater than zero or if they have paid the determined price
-        require(balanceOf(user) > 0, "User does not own any tokens");
+        require(balanceOf(user) >= price, "User does not own any tokens");
         emit AccessGranted(user);
     }
     
     function payForModelUsage() external payable onlyRole(CONSUMER) {
-        require(msg.value > 0, "Payment must be greater than zero");
+        require(msg.value >= price, "Payment must be greater than zero");
         emit DataUsagePaid(msg.sender, msg.value);
     }
 
