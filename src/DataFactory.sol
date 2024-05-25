@@ -10,7 +10,7 @@ contract DataNFTFactory is Ownable {
     SublicenseToken[] public sublicenseTokens;
     
     bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
-    
+
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 
     event DataNFTCreated(address dataNFTHolder, address dataNFTAddress, address sublicenseTokenAddress);
@@ -22,11 +22,12 @@ contract DataNFTFactory is Ownable {
         string memory ipfsURI,
         address paymentToken,
         uint256 tokenPrice,
+        uint256 fee,
         address modelDeveloper,
         address payable modelNFT
     ) public {
         // Deploy a new DataNFT contract
-        DataNFT dataNFT = new DataNFT(msg.sender, modelDeveloper, name, symbol);
+        DataNFT dataNFT = new DataNFT(name, symbol, ipfsURI, tokenPrice, fee);
         dataNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
 
         // Deploy a new SublicenseToken contract
