@@ -9,15 +9,9 @@ contract DataNFTFactory is Ownable {
     DataNFT[] public dataNFTs;
     SublicenseToken[] public sublicenseTokens;
     
-    constructor(address defaultAdmin,
-                address minter,  
-                string memory name, 
-                string memory symbol, 
-                uint256 initialSupply)
-        Ownable(defaultAdmin)
-    {
- 
-     }
+    bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
+    
+    constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 
     event DataNFTCreated(address dataNFTHolder, address dataNFTAddress, address sublicenseTokenAddress);
 
@@ -27,15 +21,22 @@ contract DataNFTFactory is Ownable {
         uint256 initialSupply,
         string memory ipfsURI,
         address paymentToken,
-        uint256 tokenPrice
+        uint256 tokenPrice,
+        address modelDeveloper,
+        address payable modelNFT
     ) public {
         // Deploy a new DataNFT contract
-        DataNFT dataNFT = new DataNFT(msg.sender, msg.sender, name, symbol);
-        //dataNFT.transferOwnership(msg.sender);  // Transfer ownership to the caller
+        DataNFT dataNFT = new DataNFT(msg.sender, modelDeveloper, name, symbol);
         dataNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
 
         // Deploy a new SublicenseToken contract
-        SublicenseToken sublicenseToken = new SublicenseToken(initialSupply, msg.sender);
+        SublicenseToken sublicenseToken = new SublicenseToken(
+            msg.sender, // dataProvider
+            modelDeveloper, // modelDeveloper
+            modelNFT, // _modelNFT
+            initialSupply,
+            msg.sender // initialOwner
+        );
         sublicenseToken.setTokenPrice(paymentToken, tokenPrice);  // Set the initial token price for the tokens
 
         // Store the contracts in arrays
@@ -47,7 +48,7 @@ contract DataNFTFactory is Ownable {
 
     function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price) public {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
-        require(sublicenseToken.dataNFTHolder() == msg.sender, "Only the DataNFT holder can set the price");
+        require(sublicenseToken.hasRole(DATA_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
         sublicenseToken.setTokenPrice(paymentToken, price);
     }
 

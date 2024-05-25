@@ -3,24 +3,36 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "DataNFT.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./DataNFT.sol";
+import "./ModelNFT.sol";
 
-contract SublicenseToken is ERC20, Ownable {
+contract SublicenseToken is ERC20, AccessControl {
+    bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
+    bytes32 public constant MODEL_DEVELOPER = keccak256("MODEL_DEVELOPER");
 
     mapping(address => uint256) public tokenPrices; // Mapping of accepted tokens to their prices in wei
     address public dataNFTHolder;
+    address payable public modelNFT;
 
     event TokensPurchased(address indexed purchaser, uint256 amount, address paymentToken);
+    event AccessGranted(address indexed user);
 
-    constructor(uint256 initialSupply,address initialOwner)
-        ERC20("SublicenseToken", "SLT")
-        Ownable(initialOwner)
-    {
-        _mint(initialOwner, initialSupply*10*decimals());
+    constructor(
+        address dataProvider,
+        address modelDeveloper,
+        address payable _modelNFT,
+        uint256 initialSupply,
+        address initialOwner
+    ) ERC20("SublicenseToken", "SLT") {
+        _grantRole(DATA_PROVIDER, dataProvider);
+        _grantRole(MODEL_DEVELOPER, modelDeveloper);
+        _mint(initialOwner, initialSupply * 10 * decimals());
+        dataNFTHolder = dataProvider;
+        modelNFT = _modelNFT;
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) external onlyRole(DATA_PROVIDER) {
         _mint(to, amount);
     }
 
@@ -57,11 +69,18 @@ contract SublicenseToken is ERC20, Ownable {
         require(address(this).balance >= amount, "Insufficient balance");
         payable(dataNFTHolder).transfer(amount);
     }
-     
-    function grantAccess(address dataNFTAddress, address user) public {
+
+    function grantAccessToDataNFT(address payable dataNFTAddress, address user) public {
         DataNFT dataNFT = DataNFT(dataNFTAddress);
         require(balanceOf(user) > 0, "User does not own any sublicense tokens");
         dataNFT.grantAccess(user);
+        emit AccessGranted(user);
+    }
+
+    function grantAccessToModelNFT(address user) external {
+        require(balanceOf(user) > 0, "User does not own any sublicense tokens");
+        ModelNFT(modelNFT).grantAccess(user);
+        emit AccessGranted(user);
     }
 
     receive() external payable {
