@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 interface IDataNFT {
     function payForDataUsage() external payable;
-    
 }
 
 contract ModelNFT is ERC721, AccessControl {
@@ -23,11 +22,13 @@ contract ModelNFT is ERC721, AccessControl {
     event DataUsagePaid(address indexed payer, uint256 amount);
     event Withdraw(address indexed recipient, uint256 amount);
 
-    constructor(string memory name,
-                string memory symbol,
-                string memory _ipfsURI,
-                address _dataNFTAddress, 
-                uint256 _price) ERC721(name, symbol) {
+    constructor(
+        string memory name,
+        string memory symbol,
+        string memory _ipfsURI,
+        address _dataNFTAddress,
+        uint256 _price
+    ) ERC721(name, symbol) {
         _grantRole(MODEL_DEVELOPER, msg.sender);
         ipfsURI = _ipfsURI;
         dataNFTAddress = _dataNFTAddress;
@@ -37,16 +38,10 @@ contract ModelNFT is ERC721, AccessControl {
     function safeDataMint(address to, uint256 tokenId) public onlyRole(MODEL_DEVELOPER) {
         _safeMint(to, tokenId);
     }
-    
 
     // The following functions are overrides required by Solidity.
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, AccessControl)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -64,13 +59,13 @@ contract ModelNFT is ERC721, AccessControl {
         require(balanceOf(user) >= price, "User does not own any tokens");
         emit AccessGranted(user);
     }
-    
+
     function payForModelUsage() external payable onlyRole(CONSUMER) {
         require(msg.value >= price, "Payment must be greater than zero");
         emit DataUsagePaid(msg.sender, msg.value);
     }
 
-    function payDataNFT(uint256 amount) external onlyRole(MODEL_DEVELOPER){
+    function payDataNFT(uint256 amount) external onlyRole(MODEL_DEVELOPER) {
         require(amount > 0, "Amount must be greater than zero");
         require(address(this).balance >= amount, "Insufficient Balance");
 
@@ -82,7 +77,7 @@ contract ModelNFT is ERC721, AccessControl {
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
 
-        (bool success, ) = msg.sender.call{value: balance}("");
+        (bool success,) = msg.sender.call{value: balance}("");
         require(success, "Withdrawal failed");
 
         emit Withdraw(msg.sender, balance);

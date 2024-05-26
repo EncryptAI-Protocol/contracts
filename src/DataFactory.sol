@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract DataNFTFactory is Ownable {
     DataNFT[] public dataNFTs;
     SublicenseToken[] public sublicenseTokens;
-    
+
     bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked("ASSET_PROVIDER"));
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
@@ -27,7 +27,7 @@ contract DataNFTFactory is Ownable {
     ) public {
         // Deploy a new DataNFT contract
         DataNFT dataNFT = new DataNFT(name, symbol, ipfsURI, tokenPrice, fee);
-        dataNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
+        dataNFT.setIPFSURI(ipfsURI); // Set the IPFS URI for the data
 
         // Deploy a new SublicenseToken contract
         SublicenseToken sublicenseToken = new SublicenseToken(
@@ -35,7 +35,7 @@ contract DataNFTFactory is Ownable {
             initialSupply,
             msg.sender // initialOwner
         );
-        sublicenseToken.setTokenPrice(paymentToken, tokenPrice);  // Set the initial token price for the tokens
+        sublicenseToken.setTokenPrice(paymentToken, tokenPrice); // Set the initial token price for the tokens
 
         // Store the contracts in arrays
         dataNFTs.push(dataNFT);
@@ -44,8 +44,9 @@ contract DataNFTFactory is Ownable {
         emit DataNFTCreated(msg.sender, address(dataNFT), address(sublicenseToken));
     }
 
-    
-    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price) public {
+    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price)
+        public
+    {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         require(sublicenseToken.hasRole(ASSET_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
         sublicenseToken.setTokenPrice(paymentToken, price);

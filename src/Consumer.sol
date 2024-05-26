@@ -25,7 +25,7 @@ contract Consumer is Ownable {
         address payable dataNFTAddress,
         address payable modelNFTAddress,
         uint256 _feePercentage
-    ) Ownable(msg.sender){
+    ) Ownable(msg.sender) {
         sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         dataNFT = DataNFT(dataNFTAddress);
         modelNFT = ModelNFT(modelNFTAddress);
@@ -40,10 +40,10 @@ contract Consumer is Ownable {
     function payForModelUsage() public payable {
         uint256 fee = (msg.value * feePercentage) / 10000;
         uint256 amountAfterFee = msg.value - fee;
-        (bool successModel, ) = payable(address(modelNFT)).call{value: amountAfterFee}("");
+        (bool successModel,) = payable(address(modelNFT)).call{value: amountAfterFee}("");
         require(successModel, "Payment to ModelNFT failed");
 
-        (bool successData, ) = payable(address(dataNFT)).call{value: fee}("");
+        (bool successData,) = payable(address(dataNFT)).call{value: fee}("");
         require(successData, "Fee payment to DataNFT failed");
 
         emit DataUsagePaid(msg.sender, msg.value);
@@ -58,7 +58,7 @@ contract Consumer is Ownable {
 
     function grantAccessToModelNFT(address user) public {
         require(sublicenseToken.balanceOf(user) > 0, "User does not own any sublicense tokens");
-        sublicenseToken.grantAccessToModelNFT(payable(address(modelNFT)),user);
+        sublicenseToken.grantAccessToModelNFT(payable(address(modelNFT)), user);
         emit AccessGranted(user);
     }
 
@@ -66,7 +66,7 @@ contract Consumer is Ownable {
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
 
-        (bool success, ) = msg.sender.call{value: balance}("");
+        (bool success,) = msg.sender.call{value: balance}("");
         require(success, "Withdrawal failed");
 
         emit Withdraw(msg.sender, balance);

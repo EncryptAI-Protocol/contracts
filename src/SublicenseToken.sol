@@ -16,11 +16,9 @@ contract SublicenseToken is ERC20, AccessControl {
     event TokensPurchased(address indexed purchaser, uint256 amount, address paymentToken);
     event AccessGranted(address indexed user);
 
-    constructor(
-        address assetProviderAddress,
-        uint256 initialSupply,
-        address initialOwner
-    ) ERC20("SublicenseToken", "SLT") {
+    constructor(address assetProviderAddress, uint256 initialSupply, address initialOwner)
+        ERC20("SublicenseToken", "SLT")
+    {
         _grantRole(ASSET_PROVIDER, assetProviderAddress);
         _mint(initialOwner, initialSupply * 10 * decimals());
         assetNFTHolder = assetProviderAddress;
@@ -35,21 +33,24 @@ contract SublicenseToken is ERC20, AccessControl {
         _;
     }
 
-    
     function setTokenPrice(address token, uint256 price) public onlyDataNFTHolder {
         tokenPrices[token] = price;
     }
 
     function buyTokens(address paymentToken, uint256 paymentAmount) public payable {
         uint256 amountToBuy;
-        if (paymentToken == address(0)) { // Ether payment
+        if (paymentToken == address(0)) {
+            // Ether payment
             require(msg.value > 0, "You need to send some Ether to buy sublicense tokens");
             amountToBuy = msg.value;
-        } else { // ERC20 token payment
+        } else {
+            // ERC20 token payment
             uint256 tokenPrice = tokenPrices[paymentToken];
             require(tokenPrice > 0, "This payment token is not accepted");
             amountToBuy = paymentAmount;
-            require(IERC20(paymentToken).transferFrom(msg.sender, assetNFTHolder, paymentAmount), "Token transfer failed");
+            require(
+                IERC20(paymentToken).transferFrom(msg.sender, assetNFTHolder, paymentAmount), "Token transfer failed"
+            );
         }
         require(amountToBuy > 0, "Insufficient payment amount to buy tokens");
 
@@ -60,11 +61,10 @@ contract SublicenseToken is ERC20, AccessControl {
         emit TokensPurchased(msg.sender, amountToBuy, paymentToken);
     }
 
-    function withdrawEther(uint256 amount) external onlyDataNFTHolder payable {
+    function withdrawEther(uint256 amount) external payable onlyDataNFTHolder {
         require(address(this).balance >= amount, "Insufficient balance");
         payable(assetNFTHolder).transfer(amount);
     }
-
 
     function grantAccessToDataNFT(address payable dataNFTAddress, address user) public {
         DataNFT dataNFT = DataNFT(dataNFTAddress);

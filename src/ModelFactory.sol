@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract ModelNFTFactory is Ownable {
     ModelNFT[] public modelNFTs;
     SublicenseToken[] public sublicenseTokens;
-    
+
     bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked("ASSET_PROVIDER"));
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
@@ -22,13 +22,13 @@ contract ModelNFTFactory is Ownable {
         string memory ipfsURI,
         address paymentToken,
         uint256 modelPrice,
-        uint256 tokenPrice, 
+        uint256 tokenPrice,
         address dataNFTAddress,
         address assetProviderAddress
     ) public {
         // Deploy a new DataNFT contract
         ModelNFT modelNFT = new ModelNFT(name, symbol, ipfsURI, dataNFTAddress, modelPrice);
-        modelNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
+        modelNFT.setIPFSURI(ipfsURI); // Set the IPFS URI for the data
 
         // Deploy a new SublicenseToken contract
         SublicenseToken sublicenseToken = new SublicenseToken(
@@ -36,7 +36,7 @@ contract ModelNFTFactory is Ownable {
             initialSupply,
             msg.sender // initialOwner
         );
-        sublicenseToken.setTokenPrice(paymentToken, tokenPrice);  // Set the initial token price for the tokens
+        sublicenseToken.setTokenPrice(paymentToken, tokenPrice); // Set the initial token price for the tokens
 
         // Store the contracts in arrays
         modelNFTs.push(modelNFT);
@@ -45,7 +45,9 @@ contract ModelNFTFactory is Ownable {
         emit ModelNFTCreated(msg.sender, address(modelNFT), address(sublicenseToken));
     }
 
-    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price) public {
+    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price)
+        public
+    {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         require(sublicenseToken.hasRole(ASSET_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
         sublicenseToken.setTokenPrice(paymentToken, price);

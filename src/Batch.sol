@@ -26,12 +26,8 @@ interface Batch {
     /// @param gasLimit Gas limit for each `to` address. Use 0 to forward all the remaining gas.
     /// If array is shorter than "to" then the remaining gas available will be used.
     /// @custom:selector 79df4b9c
-    function batchSome(
-        address[] memory to,
-        uint256[] memory value,
-        bytes[] memory callData,
-        uint64[] memory gasLimit
-    ) external;
+    function batchSome(address[] memory to, uint256[] memory value, bytes[] memory callData, uint64[] memory gasLimit)
+        external;
 
     /// @dev Batch multiple calls into a single transaction.
     /// All calls are performed from the address calling this precompile.
@@ -67,12 +63,8 @@ interface Batch {
     /// @param gasLimit Gas limit for each `to` address. Use 0 to forward all the remaining gas.
     /// If array is shorter than "to" then the remaining gas available will be used.
     /// @custom:selector 96e292b8
-    function batchAll(
-        address[] memory to,
-        uint256[] memory value,
-        bytes[] memory callData,
-        uint64[] memory gasLimit
-    ) external;
+    function batchAll(address[] memory to, uint256[] memory value, bytes[] memory callData, uint64[] memory gasLimit)
+        external;
 
     /// Emitted when a subcall succeeds.
     event SubcallSucceeded(uint256 index);
