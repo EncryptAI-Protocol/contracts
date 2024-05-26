@@ -42,9 +42,7 @@ contract DataNFTFactory is Ownable {
         emit DataNFTCreated(msg.sender, address(dataNFT), address(sublicenseToken));
     }
 
-    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, uint256 price)
-        public
-    {
+    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, uint256 price) public {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         require(sublicenseToken.hasRole(ASSET_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
         sublicenseToken.setTokenPrice(price);

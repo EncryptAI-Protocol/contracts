@@ -9,14 +9,14 @@ contract DataSourceFactory {
     event DataSourceCreated(address ownerAddress, address dataAddress, string name, uint256 price, uint256 fee);
 
     function createDataSource(
-        string memory _name,
-        string memory _symbol,
-        string memory _uri,
-        string memory _hash,
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _uri,
+        string calldata _hash,
         string[] memory _labels,
         uint256 _price,
         uint256 _fee
-    ) public {
+    ) external {
         DataSource dataSource =
             new DataSource(msg.sender, msg.sender, _name, _symbol, _hash, _uri, _price, _fee, _labels);
 

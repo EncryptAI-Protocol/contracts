@@ -8,15 +8,15 @@ contract ModelSourceFactory {
 
     event ModelSourceCreated(address ownerAddress, address dataAddress, string name, uint256 price);
 
-    function createDataSource(
-        string memory _name,
-        string memory _symbol,
-        string memory _uri,
-        string memory _hash,
+    function createModelSource(
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _uri,
+        string calldata _hash,
+        string[] memory _labels,
         uint256 _price
-    ) public {
-        ModelSource modelSource =
-            new ModelSource(msg.sender, msg.sender, _name, _symbol, _hash, _uri, _price);
+    ) external {
+        ModelSource modelSource = new ModelSource(msg.sender, msg.sender, _name, _symbol, _hash, _uri, _labels, _price);
 
         modelSources.push(modelSource);
 

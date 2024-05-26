@@ -6,5 +6,5 @@ The addresses of the deployed smart contracts on Moonbeam Alpha testnet are:
 - ModelNFTFactory: [0x8d235754A3524C00FAe0b8dCb8fd05B996AA3272](https://moonbase.moonscan.io/tx/0x698bc2e7eec7ab0f1f4cf9651a07c4ca5e492abf8cc2ad608166db727b8080e0)
 - ConsumerFactory: [0xF9F1B4441Ffe07A03743d9E25cc4699C5555B428](https://moonbase.moonscan.io/tx/0xd1efee4d27adff5fc36534ceb625d720b50052e48079a8cf0946ea9e3573fee6)
 
-- ModelSourceFactory: [0x8185E0DbAF89f2384E7502FF5a87104974d7A947](https://moonbase.moonscan.io/tx/0x50ac27f1b41ae4fb10ea0e30798c51f9ddc3fd0762e005571f249a0dac8086e0)
-- DataSourceFactory: [0xca64C76b74eb9F753fca8De6920c5997Bde7069C](https://moonbase.moonscan.io/tx/0xbf4db3c086de7790c11647008c0c016ccc48b60866f380599461d8a7582c1867)
+- ModelSourceFactory: [0x8C19b8A6d6d18cdc76539d13d08a3Cc5fFd875AD](https://moonbase.moonscan.io/tx/0x89f29491bd3081d0bb940494e9b74be8fbd4ad80acbaffec0705ea42ffcb54df)
+- DataSourceFactory: [0xf51566017d8A1ECb104B77d39BbF4Ce63DD0D3dB](https://moonbase.moonscan.io/tx/0xc3d39a67182b70b47c9a8950cf63d7ed9cabe6d8b26840266d6506582ce05d33)

@@ -11,6 +11,7 @@ struct Information {
     string symbol;
     string hash;
     uint256 price;
+    string[] labels;
 }
 
 contract ModelSource is ERC721, ERC721URIStorage, AccessControl {
@@ -30,6 +31,7 @@ contract ModelSource is ERC721, ERC721URIStorage, AccessControl {
         string memory _symbol,
         string memory _hash,
         string memory _uri,
+        string[] memory _labels,
         uint256 _price
     ) ERC721(_name, _symbol) {
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
@@ -38,6 +40,7 @@ contract ModelSource is ERC721, ERC721URIStorage, AccessControl {
         hash = _hash;
         uri = _uri;
         price = _price;
+        labels = _labels;
     }
 
     function safeMint(address to, uint256 tokenId) public onlyRole(MODEL_DEVELOPER) {
@@ -61,6 +64,6 @@ contract ModelSource is ERC721, ERC721URIStorage, AccessControl {
     }
 
     function getInfo() public view returns (Information memory) {
-        return Information(super.name(), super.symbol(), hash, price);
+        return Information(super.name(), super.symbol(), hash, price, labels);
     }
 }
