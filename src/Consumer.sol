@@ -58,7 +58,7 @@ contract Consumer is Ownable {
 
     function grantAccessToModelNFT(address user) public {
         require(sublicenseToken.balanceOf(user) > 0, "User does not own any sublicense tokens");
-        sublicenseToken.grantAccessToModelNFT(user);
+        sublicenseToken.grantAccessToModelNFT(payable(address(modelNFT)),user);
         emit AccessGranted(user);
     }
 
