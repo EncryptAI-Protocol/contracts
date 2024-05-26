@@ -9,7 +9,7 @@ contract ModelNFTFactory is Ownable {
     ModelNFT[] public modelNFTs;
     SublicenseToken[] public sublicenseTokens;
     
-    bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
+    bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked("ASSET_PROVIDER"));
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 

@@ -9,9 +9,7 @@ contract DataNFTFactory is Ownable {
     DataNFT[] public dataNFTs;
     SublicenseToken[] public sublicenseTokens;
     
-    string public constant ASSET_PROVIDER_STRING = "ASSET_PROVIDER";
-
-    bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked(ASSET_PROVIDER_STRING));
+    bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked("ASSET_PROVIDER"));
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 
