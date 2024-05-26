@@ -12,6 +12,7 @@ contract SublicenseToken is ERC20, AccessControl {
 
     mapping(address => uint256) public tokenPrices; // Mapping of accepted tokens to their prices in wei
     address public assetNFTHolder;
+    uint256 public baseTokenPrice; // Price for the base network token
 
     event TokensPurchased(address indexed purchaser, uint256 amount, address paymentToken);
     event AccessGranted(address indexed user);
@@ -33,8 +34,8 @@ contract SublicenseToken is ERC20, AccessControl {
         _;
     }
 
-    function setTokenPrice(address token, uint256 price) public onlyDataNFTHolder {
-        tokenPrices[token] = price;
+    function setTokenPrice(uint256 price) public onlyDataNFTHolder {
+        baseTokenPrice = price;
     }
 
     function buyTokens(address paymentToken, uint256 paymentAmount) public payable {

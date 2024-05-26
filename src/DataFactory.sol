@@ -20,10 +20,8 @@ contract DataNFTFactory is Ownable {
         string memory symbol,
         uint256 initialSupply,
         string memory ipfsURI,
-        address paymentToken,
         uint256 tokenPrice,
-        uint256 fee,
-        address assetProviderAddress
+        uint256 fee
     ) public {
         // Deploy a new DataNFT contract
         DataNFT dataNFT = new DataNFT(name, symbol, ipfsURI, tokenPrice, fee);
@@ -31,11 +29,11 @@ contract DataNFTFactory is Ownable {
 
         // Deploy a new SublicenseToken contract
         SublicenseToken sublicenseToken = new SublicenseToken(
-            assetProviderAddress, // dataProvider
+            msg.sender, // dataProvider
             initialSupply,
             msg.sender // initialOwner
         );
-        sublicenseToken.setTokenPrice(paymentToken, tokenPrice); // Set the initial token price for the tokens
+        sublicenseToken.setTokenPrice(tokenPrice); // Set the initial token price for the tokens
 
         // Store the contracts in arrays
         dataNFTs.push(dataNFT);
@@ -44,12 +42,12 @@ contract DataNFTFactory is Ownable {
         emit DataNFTCreated(msg.sender, address(dataNFT), address(sublicenseToken));
     }
 
-    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price)
+    function setSublicenseTokenPrice(address payable sublicenseTokenAddress, uint256 price)
         public
     {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         require(sublicenseToken.hasRole(ASSET_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
-        sublicenseToken.setTokenPrice(paymentToken, price);
+        sublicenseToken.setTokenPrice(price);
     }
 
     function getDeployedDataNFTs() public view returns (DataNFT[] memory) {
