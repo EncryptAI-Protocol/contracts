@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract DataNFT is ERC721, AccessControl {
-    bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
+    bytes32 public constant DATA_PROVIDER = keccak256(abi.encodePacked("DATA_PROVIDER"));
 
     string private ipfsURI;
 

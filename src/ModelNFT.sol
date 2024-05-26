@@ -11,8 +11,8 @@ interface IDataNFT {
 }
 
 contract ModelNFT is ERC721, AccessControl {
-    bytes32 public constant CONSUMER = keccak256("CONSUMER");
-    bytes32 public constant MODEL_DEVELOPER = keccak256("MODEL_DEVELOPER");
+    bytes32 public constant CONSUMER = keccak256(abi.encodePacked("CONSUMER"));
+    bytes32 public constant MODEL_DEVELOPER = keccak256(abi.encodePacked("MODEL_DEVELOPER"));
 
     string private ipfsURI;
     address public dataNFTAddress;

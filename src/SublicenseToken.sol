@@ -8,7 +8,7 @@ import "./DataNFT.sol";
 import "./ModelNFT.sol";
 
 contract SublicenseToken is ERC20, AccessControl {
-    bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
+    bytes32 public constant ASSET_PROVIDER = keccak256(abi.encodePacked("ASSET_PROVIDER"));
 
     mapping(address => uint256) public tokenPrices; // Mapping of accepted tokens to their prices in wei
     address public assetNFTHolder;
