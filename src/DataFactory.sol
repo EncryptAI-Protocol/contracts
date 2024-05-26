@@ -9,7 +9,7 @@ contract DataNFTFactory is Ownable {
     DataNFT[] public dataNFTs;
     SublicenseToken[] public sublicenseTokens;
     
-    bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
+    //bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 
@@ -44,11 +44,12 @@ contract DataNFTFactory is Ownable {
         emit DataNFTCreated(msg.sender, address(dataNFT), address(sublicenseToken));
     }
 
+    /*
     function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price) public {
         SublicenseToken sublicenseToken = SublicenseToken(sublicenseTokenAddress);
         require(sublicenseToken.hasRole(ASSET_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
         sublicenseToken.setTokenPrice(paymentToken, price);
-    }
+    }*/
 
     function getDeployedDataNFTs() public view returns (DataNFT[] memory) {
         return dataNFTs;
