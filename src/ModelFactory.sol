@@ -1,33 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./DataNFT.sol";
+import "./ModelNFT.sol";
 import "./SublicenseToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract DataNFTFactory is Ownable {
-    DataNFT[] public dataNFTs;
+contract ModelNFTFactory is Ownable {
+    ModelNFT[] public modelNFTs;
     SublicenseToken[] public sublicenseTokens;
     
     bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
 
     constructor(address defaultAdmin) Ownable(defaultAdmin) {}
 
-    event DataNFTCreated(address dataNFTHolder, address dataNFTAddress, address sublicenseTokenAddress);
+    event ModelNFTCreated(address modelNFTHolder, address modelNFTAddress, address sublicenseTokenAddress);
 
-    function createDataNFT(
+    function createModelNFT(
         string memory name,
         string memory symbol,
         uint256 initialSupply,
         string memory ipfsURI,
         address paymentToken,
-        uint256 tokenPrice,
-        uint256 fee,
+        uint256 modelPrice,
+        uint256 tokenPrice, 
+        address dataNFTAddress,
         address assetProviderAddress
     ) public {
         // Deploy a new DataNFT contract
-        DataNFT dataNFT = new DataNFT(name, symbol, ipfsURI, tokenPrice, fee);
-        dataNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
+        ModelNFT modelNFT = new ModelNFT(name, symbol, ipfsURI, dataNFTAddress, modelPrice);
+        modelNFT.setIPFSURI(ipfsURI);  // Set the IPFS URI for the data
 
         // Deploy a new SublicenseToken contract
         SublicenseToken sublicenseToken = new SublicenseToken(
@@ -38,10 +39,10 @@ contract DataNFTFactory is Ownable {
         sublicenseToken.setTokenPrice(paymentToken, tokenPrice);  // Set the initial token price for the tokens
 
         // Store the contracts in arrays
-        dataNFTs.push(dataNFT);
+        modelNFTs.push(modelNFT);
         sublicenseTokens.push(sublicenseToken);
 
-        emit DataNFTCreated(msg.sender, address(dataNFT), address(sublicenseToken));
+        emit ModelNFTCreated(msg.sender, address(modelNFT), address(sublicenseToken));
     }
 
     function setSublicenseTokenPrice(address payable sublicenseTokenAddress, address paymentToken, uint256 price) public {
@@ -50,8 +51,8 @@ contract DataNFTFactory is Ownable {
         sublicenseToken.setTokenPrice(paymentToken, price);
     }
 
-    function getDeployedDataNFTs() public view returns (DataNFT[] memory) {
-        return dataNFTs;
+    function getDeployedModelNFTs() public view returns (ModelNFT[] memory) {
+        return modelNFTs;
     }
 
     function getDeployedSublicenseTokens() public view returns (SublicenseToken[] memory) {

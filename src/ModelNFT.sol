@@ -23,14 +23,12 @@ contract ModelNFT is ERC721, AccessControl {
     event DataUsagePaid(address indexed payer, uint256 amount);
     event Withdraw(address indexed recipient, uint256 amount);
 
-    constructor(address consumer, 
-                string memory name,
+    constructor(string memory name,
                 string memory symbol,
                 string memory _ipfsURI,
                 address _dataNFTAddress, 
                 uint256 _price) ERC721(name, symbol) {
         _grantRole(MODEL_DEVELOPER, msg.sender);
-        _grantRole(CONSUMER, consumer);
         ipfsURI = _ipfsURI;
         dataNFTAddress = _dataNFTAddress;
         price = _price;

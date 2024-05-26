@@ -8,39 +8,34 @@ import "./DataNFT.sol";
 import "./ModelNFT.sol";
 
 contract SublicenseToken is ERC20, AccessControl {
-    bytes32 public constant DATA_PROVIDER = keccak256("DATA_PROVIDER");
-    bytes32 public constant MODEL_DEVELOPER = keccak256("MODEL_DEVELOPER");
+    bytes32 public constant ASSET_PROVIDER = keccak256("ASSET_PROVIDER");
 
     mapping(address => uint256) public tokenPrices; // Mapping of accepted tokens to their prices in wei
-    address public dataNFTHolder;
-    address payable public modelNFT;
+    address public assetNFTHolder;
 
     event TokensPurchased(address indexed purchaser, uint256 amount, address paymentToken);
     event AccessGranted(address indexed user);
 
     constructor(
-        address dataProvider,
-        address modelDeveloper,
-        address payable _modelNFT,
+        address assetProviderAddress,
         uint256 initialSupply,
         address initialOwner
     ) ERC20("SublicenseToken", "SLT") {
-        _grantRole(DATA_PROVIDER, dataProvider);
-        _grantRole(MODEL_DEVELOPER, modelDeveloper);
+        _grantRole(ASSET_PROVIDER, assetProviderAddress);
         _mint(initialOwner, initialSupply * 10 * decimals());
-        dataNFTHolder = dataProvider;
-        modelNFT = _modelNFT;
+        assetNFTHolder = assetProviderAddress;
     }
 
-    function mint(address to, uint256 amount) external onlyRole(DATA_PROVIDER) {
+    function mint(address to, uint256 amount) external onlyRole(ASSET_PROVIDER) {
         _mint(to, amount);
     }
 
     modifier onlyDataNFTHolder() {
-        require(msg.sender == dataNFTHolder, "Caller is not the DataNFT holder");
+        require(msg.sender == assetNFTHolder, "Caller is not the DataNFT holder");
         _;
     }
 
+    
     function setTokenPrice(address token, uint256 price) public onlyDataNFTHolder {
         tokenPrices[token] = price;
     }
@@ -54,7 +49,7 @@ contract SublicenseToken is ERC20, AccessControl {
             uint256 tokenPrice = tokenPrices[paymentToken];
             require(tokenPrice > 0, "This payment token is not accepted");
             amountToBuy = paymentAmount;
-            require(IERC20(paymentToken).transferFrom(msg.sender, dataNFTHolder, paymentAmount), "Token transfer failed");
+            require(IERC20(paymentToken).transferFrom(msg.sender, assetNFTHolder, paymentAmount), "Token transfer failed");
         }
         require(amountToBuy > 0, "Insufficient payment amount to buy tokens");
 
@@ -67,8 +62,9 @@ contract SublicenseToken is ERC20, AccessControl {
 
     function withdrawEther(uint256 amount) external onlyDataNFTHolder payable {
         require(address(this).balance >= amount, "Insufficient balance");
-        payable(dataNFTHolder).transfer(amount);
+        payable(assetNFTHolder).transfer(amount);
     }
+
 
     function grantAccessToDataNFT(address payable dataNFTAddress, address user) public {
         DataNFT dataNFT = DataNFT(dataNFTAddress);
@@ -77,9 +73,10 @@ contract SublicenseToken is ERC20, AccessControl {
         emit AccessGranted(user);
     }
 
-    function grantAccessToModelNFT(address user) external {
+    function grantAccessToModelNFT(address payable modelNFTAddress, address user) external {
+        ModelNFT modelNFT = ModelNFT(modelNFTAddress);
         require(balanceOf(user) > 0, "User does not own any sublicense tokens");
-        ModelNFT(modelNFT).grantAccess(user);
+        modelNFT.grantAccess(user);
         emit AccessGranted(user);
     }
 
