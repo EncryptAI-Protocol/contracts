@@ -69,14 +69,14 @@ contract DataNFT is ERC721, AccessControl {
     function setTokenURI(uint256 tokenId, string memory _ipfsURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].ipfsURI = _ipfsURI;
-        emit IPFSURISet(tokenId, _ipfsURI);
+       // emit IPFSURISet(tokenId, _ipfsURI);
     }
 
     function getTokenURI(uint256 tokenId) public view override onlyRole(DEFAULT_ADMIN_ROLE) returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
         return _tokenAttributes[tokenId].ipfsURI;
     }
-
+    /*
     function grantAccess(address user) external {
         // Check if the user has a balance greater than price or if they have paid the determined price
         require(balanceOf(user) >= price, "User does not own enough tokens");
@@ -93,6 +93,7 @@ contract DataNFT is ERC721, AccessControl {
         require(msg.value >= fee, "Payment must be greater than zero");
         emit PredictionFeePaid(msg.sender, msg.value);
     }
+    */
 
     // Function for the owner to withdraw collected funds
     function withdrawFunds() external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -102,7 +103,7 @@ contract DataNFT is ERC721, AccessControl {
         (bool success,) = msg.sender.call{value: balance}("");
         require(success, "Withdrawal failed");
 
-        emit Withdraw(msg.sender, balance);
+        //emit Withdraw(msg.sender, balance);
     }
 
     // Function to receive Ether directly
