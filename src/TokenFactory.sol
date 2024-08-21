@@ -59,11 +59,11 @@ contract TokenFactory is Ownable {
         dataNFT.burn(tokenId);
     }
 
-    function setEncryptAITokenPrice(address payable encryptAITokenAddress, uint256 price) public {
-        EncryptAIToken encryptAIToken = EncryptAIToken(encryptAITokenAddress);
-        require(encryptAIToken.hasRole(DATA_NFT_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
-        encryptAIToken.setTokenPrice(price);
-    }
+    //function setEncryptAITokenPrice(address payable encryptAITokenAddress, uint256 price) public {
+    //    EncryptAIToken encryptAIToken = EncryptAIToken(encryptAITokenAddress);
+    //    require(encryptAIToken.hasRole(DATA_NFT_PROVIDER, msg.sender), "Only the DataNFT holder can set the price");
+    //    encryptAIToken.setTokenPrice(price);
+    //}
 
     /* since we are only deploying one instance of each contract, we might not need these functions
 
