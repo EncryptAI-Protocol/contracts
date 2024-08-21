@@ -2,9 +2,9 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol" as OZAC;
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract DataNFT is ERC721, OZAC {
+contract DataNFT is ERC721, AccessControl {
     uint256 private _currentTokenId = 0;
 
     struct NFTAttributes {
@@ -24,7 +24,7 @@ contract DataNFT is ERC721, OZAC {
     event DataNFTCreated(address indexed to, uint256 tokenId);
 
     constructor() ERC721("DataNFT", "DNFT") {
-        OZAC._setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function safeDataMint(
@@ -46,17 +46,17 @@ contract DataNFT is ERC721, OZAC {
     }
 
     function getTokenAttributes(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTAttributes memory) {
-        require(ERC721._exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         return _tokenAttributes[tokenId];
     }
 
     function setTokenPrice(uint256 tokenId, uint256 price) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(ERC721._exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].tokenPrice = price;
     }
 
     function setTokenFee(uint256 tokenId, uint256 fee) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(ERC721._exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].fee = fee;
     }
 
@@ -67,13 +67,13 @@ contract DataNFT is ERC721, OZAC {
     }
 
     function setTokenURI(uint256 tokenId, string memory _ipfsURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(ERC721._exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].ipfsURI = _ipfsURI;
        // emit IPFSURISet(tokenId, _ipfsURI);
     }
 
-    function getTokenURI(uint256 tokenId) public view override onlyRole(DEFAULT_ADMIN_ROLE) returns (string memory) {
-        require(ERC721._exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    function getTokenURI(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
         return _tokenAttributes[tokenId].ipfsURI;
     }
     /*

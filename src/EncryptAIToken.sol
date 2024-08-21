@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./DataNFT.sol";
-import "./ModelNFT.sol";
+//import "./ModelNFT.sol";
 
 contract EncryptAIToken is ERC20, AccessControl {
     bytes32 public constant EAI_TOKEN_PROVIDER = keccak256(abi.encodePacked("EAI_TOKEN_PROVIDER"));
@@ -33,7 +33,7 @@ contract EncryptAIToken is ERC20, AccessControl {
 
     function buyTokens(address paymentToken, uint256 paymentAmount) external payable {
         uint256 amountToBuy;
-        address assetProvider = getRoleMember(EAI_TOKEN_PROVIDER, 0);
+        address assetProvider = AccessControl.getRoleMember(EAI_TOKEN_PROVIDER, 0);
         if (paymentToken == address(0)) {
             // Ether payment
             require(msg.value > 0, "You need to send some Ether to buy EAI tokens");
@@ -56,6 +56,7 @@ contract EncryptAIToken is ERC20, AccessControl {
         _transfer(address(this), msg.sender, amountToBuy);
         emit TokensPurchased(msg.sender, amountToBuy, paymentToken);
     }
+    /*
 
     function withdrawEther(uint256 amount) external payable onlyDataNFTHolder {
         require(address(this).balance >= amount, "Insufficient balance");
@@ -79,4 +80,5 @@ contract EncryptAIToken is ERC20, AccessControl {
     receive() external payable {
         revert("Direct Ether payments not accepted");
     }
+    */
 }
