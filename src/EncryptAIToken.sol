@@ -20,7 +20,7 @@ contract EncryptAIToken is ERC20, AccessControl {
         ERC20("EncryptAIToken", "EAI")
     {
         _grantRole(EAI_TOKEN_PROVIDER, address(this));
-        _mint(address(this), initialSupply * 10 * decimals()); // Mint initial supply to the contract address. Allow the contract to manage the supply (good for security, ICO, staking, etc.)
+        _mint(address(this), initialSupply * 10 **decimals()); // Mint initial supply to the contract address. Allow the contract to manage the supply (good for security, ICO, staking, etc.)
     }
 
     function mint(address to, uint256 amount) external onlyRole(EAI_TOKEN_PROVIDER) {

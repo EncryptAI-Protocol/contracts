@@ -16,7 +16,6 @@ contract DataNFT is ERC721, AccessControl {
         bytes32 datasetHash; // dataset hash, to prevent duplicates
     }
 
-    // Mapping to track existing dataset hashes
     mapping(uint256 => address) public _tokenMinters;
     mapping(bytes32 => bool) private _datasetHashes;
     mapping(uint256 => NFTAttributes) private _tokenAttributes;
@@ -80,8 +79,8 @@ contract DataNFT is ERC721, AccessControl {
     function burn(uint256 tokenId) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI query for nonexistent token");
         _burn(tokenId);
-        delete _tokenAttributes[tokenId];
         delete _datasetHashes[_tokenAttributes[tokenId].datasetHash];
+        delete _tokenAttributes[tokenId];
         delete _tokenMinters[tokenId];
     }
 
