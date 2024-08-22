@@ -17,7 +17,7 @@ contract DataNFT is ERC721, AccessControl {
     }
 
     // Mapping to track existing dataset hashes
-    mapping(uint256 => address) private _tokenMinters;
+    mapping(uint256 => address) public _tokenMinters;
     mapping(bytes32 => bool) private _datasetHashes;
     mapping(uint256 => NFTAttributes) private _tokenAttributes;
 
@@ -46,17 +46,17 @@ contract DataNFT is ERC721, AccessControl {
     }
 
     function getTokenAttributes(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTAttributes memory) {
-        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
         return _tokenAttributes[tokenId];
     }
 
     function setTokenPrice(uint256 tokenId, uint256 price) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].tokenPrice = price;
     }
 
     function setTokenFee(uint256 tokenId, uint256 fee) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].fee = fee;
     }
 
@@ -67,15 +67,24 @@ contract DataNFT is ERC721, AccessControl {
     }
 
     function setTokenURI(uint256 tokenId, string memory _ipfsURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
         _tokenAttributes[tokenId].ipfsURI = _ipfsURI;
        // emit IPFSURISet(tokenId, _ipfsURI);
     }
 
     function getTokenURI(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (string memory) {
-        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI query for nonexistent token");
         return _tokenAttributes[tokenId].ipfsURI;
     }
+
+    function burn(uint256 tokenId) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI query for nonexistent token");
+        _burn(tokenId);
+        delete _tokenAttributes[tokenId];
+        delete _datasetHashes[_tokenAttributes[tokenId].datasetHash];
+        delete _tokenMinters[tokenId];
+    }
+
     /*
     function grantAccess(address user) external {
         // Check if the user has a balance greater than price or if they have paid the determined price

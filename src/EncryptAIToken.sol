@@ -20,7 +20,7 @@ contract EncryptAIToken is ERC20, AccessControl {
         ERC20("EncryptAIToken", "EAI")
     {
         _grantRole(EAI_TOKEN_PROVIDER, address(this));
-        _mint(address(this), initialSupply * 10 * decimals()); // Mint initial supply to the contract address. Allow the contract to manage the supply, instead of the deployer (good for security, staking, etc.)
+        _mint(address(this), initialSupply * 10 * decimals()); // Mint initial supply to the contract address. Allow the contract to manage the supply (good for security, ICO, staking, etc.)
     }
 
     function mint(address to, uint256 amount) external onlyRole(EAI_TOKEN_PROVIDER) {
@@ -33,7 +33,6 @@ contract EncryptAIToken is ERC20, AccessControl {
 
     function buyTokens(address paymentToken, uint256 paymentAmount) external payable {
         uint256 amountToBuy;
-        address assetProvider = AccessControl.getRoleMember(EAI_TOKEN_PROVIDER, 0);
         if (paymentToken == address(0)) {
             // Ether payment
             require(msg.value > 0, "You need to send some Ether to buy EAI tokens");
@@ -45,7 +44,7 @@ contract EncryptAIToken is ERC20, AccessControl {
             require(tokenPrice != 0, "This payment token is not accepted");
             amountToBuy = paymentAmount / tokenPrice;
             require(
-                IERC20(paymentToken).transferFrom(msg.sender, assetProvider, paymentAmount), "Token transfer failed"
+                IERC20(paymentToken).transferFrom(msg.sender, address(this), paymentAmount), "Token transfer failed"
             );
         }
         require(amountToBuy > 0, "Insufficient payment amount to buy tokens");

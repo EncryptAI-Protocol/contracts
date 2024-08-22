@@ -14,7 +14,7 @@ contract TokenFactory is Ownable {
         // Deploy the DataNFT contract
         dataNFT = new DataNFT();
         // Deploy the EncryptAIToken contract
-        encryptAIToken = new EncryptAIToken(msg.sender, 1000000);
+        encryptAIToken = new EncryptAIToken(1000000);
     }
 
     function createDataNFT(
