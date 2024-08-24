@@ -11,9 +11,15 @@ contract DataNFT is ERC721, AccessControl {
         string name;
         string symbol;
         string ipfsURI;
+        string icon;
         uint256 tokenPrice;
         uint256 fee;
         bytes32 datasetHash; // dataset hash, to prevent duplicates
+    }
+
+    struct NFTDetails {
+        NFTAttributes attributes;
+        address owner;
     }
 
     mapping(uint256 => address) public _tokenMinters;
@@ -31,6 +37,7 @@ contract DataNFT is ERC721, AccessControl {
         string memory name,
         string memory symbol,
         string memory ipfsURI,
+        string memory icon,
         uint256 tokenPrice,
         uint256 fee,
         bytes32 datasetHash
@@ -38,7 +45,7 @@ contract DataNFT is ERC721, AccessControl {
         require(!_datasetHashes[datasetHash], "Dataset hash already exists"); // Check for duplicates
         uint256 tokenId = _currentTokenId++;
         _safeMint(to, tokenId);
-        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, tokenPrice, fee, datasetHash);
+        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash);
         _datasetHashes[datasetHash] = true;
         _tokenMinters[tokenId] = to; // Record the minter of the token
         emit DataNFTCreated(to, tokenId);
@@ -47,6 +54,10 @@ contract DataNFT is ERC721, AccessControl {
     function getTokenAttributes(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTAttributes memory) {
         require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
         return _tokenAttributes[tokenId];
+    }
+
+    function getTokenOwner(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (address) {
+        return ownerOf(tokenId);
     }
 
     function setTokenPrice(uint256 tokenId, uint256 price) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -74,6 +85,32 @@ contract DataNFT is ERC721, AccessControl {
     function getTokenURI(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (string memory) {
         require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI query for nonexistent token");
         return _tokenAttributes[tokenId].ipfsURI;
+    }
+
+    function setTokenIcon(uint256 tokenId, string memory _icon) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI set of nonexistent token");
+        _tokenAttributes[tokenId].icon = _icon;
+    }
+
+    function getAllMintedNFTs() public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTDetails[] memory) {
+        require(_currentTokenId > 0, "No DataNFTs minted yet");
+        
+        uint256 validTokenCount = 0;
+        for (uint256 i = 0; i <= _currentTokenId; i++) {
+            if (_ownerOf(i) != address(0)) {
+                validTokenCount++;
+            }
+        }
+
+        NFTDetails[] memory allNFTs = new NFTDetails[](validTokenCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i <= _currentTokenId; i++) {
+            if (_ownerOf(i) != address(0)) {
+                allNFTs[index] = NFTDetails(_tokenAttributes[i], ownerOf(i));
+                index++;
+            }
+        }
+        return allNFTs;
     }
 
     function burn(uint256 tokenId) public onlyRole(DEFAULT_ADMIN_ROLE) {

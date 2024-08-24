@@ -22,12 +22,13 @@ contract TokenFactory is Ownable {
         string memory name,
         string memory symbol,
         string memory ipfsURI,
+        string memory icon,
         uint256 tokenPrice,
         uint256 fee,
         bytes32 datasetHash
     ) public {
         // Mint a new DataNFT with specific attributes
-        dataNFT.safeDataMint(to, name, symbol, ipfsURI, tokenPrice, fee, datasetHash);
+        dataNFT.safeDataMint(to, name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash);
         //grantRole(DATA_PROVIDER, to);
     }
 
@@ -52,6 +53,10 @@ contract TokenFactory is Ownable {
     function setTokenFee(uint256 tokenId, uint256 fee) public {
         require(dataNFT._tokenMinters(tokenId) == msg.sender, "Caller is not the minter of this token");
         dataNFT.setTokenFee(tokenId, fee);
+    }
+
+    function getAllMintedNFTs() public view returns (DataNFT.NFTDetails[] memory) {
+        return dataNFT.getAllMintedNFTs();
     }
 
     function burnDataNFT(uint256 tokenId) public {
