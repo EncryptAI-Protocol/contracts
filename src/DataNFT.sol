@@ -15,6 +15,8 @@ contract DataNFT is ERC721, AccessControl {
         uint256 tokenPrice;
         uint256 fee;
         bytes32 datasetHash; // dataset hash, to prevent duplicates
+        string[] labels;
+        string desc;
     }
 
     struct NFTDetails {
@@ -40,12 +42,14 @@ contract DataNFT is ERC721, AccessControl {
         string memory icon,
         uint256 tokenPrice,
         uint256 fee,
-        bytes32 datasetHash
+        bytes32 datasetHash,
+        string[] memory labels,
+        string memory desc
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!_datasetHashes[datasetHash], "Dataset hash already exists"); // Check for duplicates
         uint256 tokenId = _currentTokenId++;
         _safeMint(to, tokenId);
-        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash);
+        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash, labels, desc);
         _datasetHashes[datasetHash] = true;
         _tokenMinters[tokenId] = to; // Record the minter of the token
         emit DataNFTCreated(to, tokenId);

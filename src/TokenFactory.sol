@@ -25,10 +25,12 @@ contract TokenFactory is Ownable {
         string memory icon,
         uint256 tokenPrice,
         uint256 fee,
-        bytes32 datasetHash
+        bytes32 datasetHash,
+        string[] memory labels,
+        string memory desc
     ) public {
         // Mint a new DataNFT with specific attributes
-        dataNFT.safeDataMint(to, name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash);
+        dataNFT.safeDataMint(to, name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash, labels, desc);
         //grantRole(DATA_PROVIDER, to);
     }
 
