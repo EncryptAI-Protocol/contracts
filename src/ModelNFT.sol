@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract DataNFT is ERC721, AccessControl {
+contract ModelNFT is ERC721, AccessControl {
     uint256 private _currentTokenId = 0;
 
     struct NFTAttributes {
@@ -14,8 +14,9 @@ contract DataNFT is ERC721, AccessControl {
         string icon;
         uint256 tokenPrice;
         uint256 fee;
-        bytes32 datasetHash; // dataset hash, to prevent duplicates
+        bytes32 modelHash; // hash of the model, to prevent duplicates
         string[] labels;
+        string modelType;
         string desc;
     }
 
@@ -26,16 +27,16 @@ contract DataNFT is ERC721, AccessControl {
     }
 
     mapping(uint256 => address) public _tokenMinters;
-    mapping(bytes32 => bool) private _datasetHashes;
+    mapping(bytes32 => bool) private _modelHashes;
     mapping(uint256 => NFTAttributes) private _tokenAttributes;
 
-    event DataNFTCreated(address indexed to, uint256 tokenId);
+    event ModelNFTCreated(address indexed to, uint256 tokenId);
 
-    constructor(address admin) ERC721("DataNFT", "DNFT") {
+    constructor(address admin) ERC721("ModelNFT", "MNFT") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
     }
 
-    function safeDataMint(
+    function safeModelMint(
         address to,
         string memory name,
         string memory symbol,
@@ -43,17 +44,18 @@ contract DataNFT is ERC721, AccessControl {
         string memory icon,
         uint256 tokenPrice,
         uint256 fee,
-        bytes32 datasetHash,
+        bytes32 modelHash,
         string[] memory labels,
+        string memory modelType,
         string memory desc
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(!_datasetHashes[datasetHash], "Dataset hash already exists"); // Check for duplicates
+        require(!_modelHashes[modelHash], "Model hash already exists"); // Check for duplicates
         uint256 tokenId = _currentTokenId++;
         _safeMint(to, tokenId);
-        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, icon, tokenPrice, fee, datasetHash, labels, desc);
-        _datasetHashes[datasetHash] = true;
+        _tokenAttributes[tokenId] = NFTAttributes(name, symbol, ipfsURI, icon, tokenPrice, fee, modelHash, labels, modelType, desc);
+        _modelHashes[modelHash] = true;
         _tokenMinters[tokenId] = to; // Record the minter of the token
-        emit DataNFTCreated(to, tokenId);
+        emit ModelNFTCreated(to, tokenId);
     }
 
     function getTokenAttributes(uint256 tokenId) public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTAttributes memory) {
@@ -95,8 +97,8 @@ contract DataNFT is ERC721, AccessControl {
         _tokenAttributes[tokenId].icon = _icon;
     }
 
-    function getAllMintedDataNFTs() public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTDetails[] memory) {
-        require(_currentTokenId > 0, "No DataNFTs minted yet");
+    function getAllMintedModelNFTs() public view onlyRole(DEFAULT_ADMIN_ROLE) returns (NFTDetails[] memory) {
+        require(_currentTokenId > 0, "No ModelNFTs minted yet");
         
         uint256 validTokenCount = 0;
         for (uint256 i = 0; i <= _currentTokenId; i++) {
@@ -105,7 +107,7 @@ contract DataNFT is ERC721, AccessControl {
             }
         }
 
-       NFTDetails[] memory allNFTs = new NFTDetails[](validTokenCount);
+        NFTDetails[] memory allNFTs = new NFTDetails[](validTokenCount);
         uint256 index = 0;
         for (uint256 i = 0; i <= _currentTokenId; i++) {
             if (_ownerOf(i) != address(0)) {
@@ -123,7 +125,7 @@ contract DataNFT is ERC721, AccessControl {
     function burn(uint256 tokenId) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_ownerOf(tokenId) != address(0), "ERC721Metadata: URI query for nonexistent token");
         _burn(tokenId);
-        delete _datasetHashes[_tokenAttributes[tokenId].datasetHash];
+        delete _modelHashes[_tokenAttributes[tokenId].modelHash];
         delete _tokenAttributes[tokenId];
         delete _tokenMinters[tokenId];
     }
