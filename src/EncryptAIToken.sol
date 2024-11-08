@@ -4,10 +4,9 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./DataNFT.sol";
-//import "./ModelNFT.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract EncryptAIToken is ERC20, AccessControl {
+contract EncryptAIToken is ERC20, AccessControl, ReentrancyGuard {
     bytes32 public constant EAI_TOKEN_PROVIDER = keccak256(abi.encodePacked("EAI_TOKEN_PROVIDER"));
 
     mapping(address => uint256) public tokenPrices; // Mapping of accepted tokens to their prices in wei
@@ -15,11 +14,13 @@ contract EncryptAIToken is ERC20, AccessControl {
 
     event TokensPurchased(address indexed purchaser, uint256 amount, address paymentToken);
     event AccessGranted(address indexed user);
+    event AccessRevoked(address indexed user);
 
     constructor(uint256 initialSupply)
         ERC20("EncryptAIToken", "EAI")
     {
-        _grantRole(EAI_TOKEN_PROVIDER, address(this));
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(EAI_TOKEN_PROVIDER, msg.sender);
         _mint(address(this), initialSupply * 10 **decimals()); // Mint initial supply to the contract address. Allow the contract to manage the supply (good for security, ICO, staking, etc.)
     }
 
@@ -27,11 +28,15 @@ contract EncryptAIToken is ERC20, AccessControl {
         _mint(to, amount);
     }
 
-    function setTokenPrice(uint256 price) external onlyRole(EAI_TOKEN_PROVIDER) {
+    function setBaseTokenPrice(uint256 price) external onlyRole(EAI_TOKEN_PROVIDER) {
         baseTokenPrice = price;
     }
 
-    function buyTokens(address paymentToken, uint256 paymentAmount) external payable {
+    function setTokenPrice(address tokenAddress, uint256 price) external onlyRole(EAI_TOKEN_PROVIDER) {
+        tokenPrices[tokenAddress] = price;
+    }
+
+    function buyTokens(address paymentToken, uint256 paymentAmount) external payable nonReentrant {
         uint256 amountToBuy;
         if (paymentToken == address(0)) {
             // Ether payment
@@ -55,29 +60,14 @@ contract EncryptAIToken is ERC20, AccessControl {
         _transfer(address(this), msg.sender, amountToBuy);
         emit TokensPurchased(msg.sender, amountToBuy, paymentToken);
     }
-    /*
 
-    function withdrawEther(uint256 amount) external payable onlyDataNFTHolder {
-        require(address(this).balance >= amount, "Insufficient balance");
-        payable(assetNFTHolder).transfer(amount);
+    function grantProviderRole(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _grantRole(EAI_TOKEN_PROVIDER, account);
+        emit AccessGranted(account);
     }
 
-    function grantAccessToDataNFT(address payable dataNFTAddress, address user) public {
-        DataNFT dataNFT = DataNFT(dataNFTAddress);
-        require(balanceOf(user) > 0, "User does not own any EAI tokens");
-        dataNFT.grantAccess(user);
-        emit AccessGranted(user);
+    function revokeProviderRole(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _revokeRole(EAI_TOKEN_PROVIDER, account);
+        emit AccessRevoked(account);
     }
-
-    function grantAccessToModelNFT(address payable modelNFTAddress, address user) external {
-        ModelNFT modelNFT = ModelNFT(modelNFTAddress);
-        require(balanceOf(user) > 0, "User does not own any EAI tokens");
-        modelNFT.grantAccess(user);
-        emit AccessGranted(user);
-    }
-
-    receive() external payable {
-        revert("Direct Ether payments not accepted");
-    }
-    */
 }
